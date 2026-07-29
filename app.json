@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "RoadRescueNative",
+    "slug": "RoadRescueNative",
+    "scheme": "roadrescue",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/app_icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/app_splash_icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/app_adaptive_icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "VIBRATE",
+        "POST_NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC1ISFk-MLFBI4TSTinyZAzbBW4mWM9vAE"
+        }
+      },
+      "package": "com.anonymous.RoadRescueNative",
+      "googleServicesFile": "./google-services.json"
+    },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-location",
+        {
+          "locationAlwaysPermission": "Allow RoadRescue to access your location even when the app is in the background to provide accurate breakdown assistance."
+        }
+      ]
+    ],
+    "web": {
+
+      "favicon": "./assets/favicon.png",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC1ISFk-MLFBI4TSTinyZAzbBW4mWM9vAE"
+        }
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2c23398a-7a49-410e-8fdc-f166d99c5cbe"
+      }
+    },
+    "owner": "nandivardhan"
+  }
+}

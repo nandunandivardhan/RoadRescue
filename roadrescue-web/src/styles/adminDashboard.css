@@ -1,0 +1,252 @@
+/* 
+  RoadRescue Admin Theme - Premium Dark Glassmorphism 
+  Colors:
+    Primary: #FF6B35 (Orange Accent)
+    Dark BG: #0F1419
+    Card BG: #1A1F2E (rgba(26, 31, 46, 0.6) with blur)
+    Text Primary: #E8E8E8
+    Text Secondary: #A8A8A8
+*/
+
+:root {
+  --admin-primary: #FF6B35;
+  --admin-primary-hover: #e0531f;
+  --admin-bg: #0F1419;
+  --admin-card-bg: rgba(26, 31, 46, 0.65);
+  --admin-border: rgba(255, 107, 53, 0.12);
+  --admin-text: #E8E8E8;
+  --admin-text-secondary: #A8A8A8;
+  --admin-success: #4CAF50;
+  --admin-warning: #FFC107;
+  --admin-danger: #F44336;
+  --admin-info: #2196F3;
+  --admin-font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.admin-theme {
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+  font-family: var(--admin-font);
+  min-vh: 100vh;
+}
+
+/* Glassmorphism styling */
+.admin-glass-card {
+  background: var(--admin-card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-glass-card:hover {
+  border-color: rgba(255, 107, 53, 0.25);
+  box-shadow: 0 10px 40px 0 rgba(255, 107, 53, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Typography & Badges */
+.admin-title-gradient {
+  background: linear-gradient(90deg, #FFFFFF 0%, #FF6B35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.admin-badge-success {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #81C784;
+  border: 1px solid rgba(76, 175, 80, 0.25);
+}
+
+.admin-badge-warning {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #FFD54F;
+  border: 1px solid rgba(255, 193, 7, 0.25);
+}
+
+.admin-badge-danger {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #E57373;
+  border: 1px solid rgba(244, 67, 54, 0.25);
+}
+
+.admin-badge-info {
+  background-color: rgba(33, 150, 243, 0.15);
+  color: #64B5F6;
+  border: 1px solid rgba(33, 150, 243, 0.25);
+}
+
+/* Animations */
+@keyframes admin-pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+    border-color: rgba(244, 67, 54, 0.8);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(244, 67, 54, 0);
+    border-color: rgba(244, 67, 54, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+    border-color: rgba(244, 67, 54, 0.8);
+  }
+}
+
+.admin-pulse-emergency {
+  animation: admin-pulse-red 2s infinite;
+  background: rgba(244, 67, 54, 0.1);
+  border: 2px solid var(--admin-danger) !important;
+}
+
+@keyframes flash-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.admin-flash-text {
+  animation: flash-text 1.5s infinite;
+  color: #FF8A80;
+}
+
+/* Buttons */
+.admin-btn-primary {
+  background-color: var(--admin-primary);
+  border: 1px solid var(--admin-primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.admin-btn-primary:hover {
+  background-color: var(--admin-primary-hover);
+  border-color: var(--admin-primary-hover);
+  box-shadow: 0 0 14px rgba(255, 107, 53, 0.3);
+  transform: translateY(-1px);
+}
+
+.admin-btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--admin-primary);
+  color: var(--admin-primary);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.admin-btn-secondary:hover {
+  background-color: rgba(255, 107, 53, 0.08);
+  box-shadow: 0 0 14px rgba(255, 107, 53, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Form controls */
+.admin-input {
+  background-color: rgba(15, 20, 25, 0.6);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  color: var(--admin-text) !important;
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+}
+
+.admin-input:focus {
+  background-color: rgba(15, 20, 25, 0.9);
+  border-color: var(--admin-primary);
+  outline: none;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.25);
+}
+
+/* Custom Table */
+.admin-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 53, 0.08);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--admin-text);
+  font-size: 14px;
+}
+
+.admin-table th {
+  background-color: rgba(26, 31, 46, 0.9);
+  color: var(--admin-text);
+  font-weight: 600;
+  padding: 14px 18px;
+  border-bottom: 2px solid rgba(255, 107, 53, 0.15);
+  text-align: left;
+}
+
+.admin-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.05);
+  background-color: rgba(26, 31, 46, 0.4);
+}
+
+.admin-table tr:hover td {
+  background-color: rgba(255, 107, 53, 0.04) !important;
+}
+
+/* Nav Menu list layout */
+.admin-nav-item {
+  color: var(--admin-text-secondary);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.admin-nav-item:hover, .admin-nav-item.active {
+  color: var(--admin-primary);
+  background-color: rgba(255, 107, 53, 0.08);
+}
+
+/* Sticky top navigation glassmorphism */
+.admin-navbar {
+  background: rgba(15, 20, 25, 0.85);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+/* Maps and popup adjustments */
+.admin-map {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  height: 500px;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #1A1F2E !important;
+  color: #E8E8E8 !important;
+  border: 1px solid #FF6B35 !important;
+  border-radius: 10px !important;
+}
+
+.leaflet-popup-tip {
+  background: #1A1F2E !important;
+  border: 1px solid #FF6B35 !important;
+}
+
+/* Leaflet dark filter custom overlay */
+.admin-dark-map .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}

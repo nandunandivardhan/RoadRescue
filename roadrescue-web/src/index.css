@@ -1,0 +1,290 @@
+/* RoadRescue Premium Custom Design System Stylesheet */
+:root {
+  --primary-color: #FF6B35;
+  --primary-hover: #E85A28;
+  --secondary-color: #1B2CC1;
+  --dark-bg: #0F1117;
+  --card-bg: #1B1E28;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(27, 30, 40, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --gold-color: #FFD700;
+  --font-outfit: 'Outfit', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: var(--dark-bg);
+  color: #F3F4F6;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism Card Style */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 107, 53, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(255, 107, 53, 0.1);
+}
+
+/* Premium Buttons */
+.btn-primary-custom {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #FF885B 100%);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-family: var(--font-outfit);
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25);
+}
+
+.btn-primary-custom:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+  color: #fff;
+}
+
+.btn-secondary-custom {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #F3F4F6;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.btn-secondary-custom:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.btn-sos {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF1744 0%, #B71C1C 100%);
+  border: 8px solid rgba(255, 23, 68, 0.2);
+  box-shadow: 0 0 40px rgba(255, 23, 68, 0.6);
+  color: #fff;
+  font-family: var(--font-outfit);
+  font-weight: 900;
+  font-size: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-sos:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 60px rgba(255, 23, 68, 0.9);
+  border-color: rgba(255, 23, 68, 0.4);
+  color: #fff;
+}
+
+/* Custom Text and Utility Classes */
+.text-gradient {
+  background: linear-gradient(135deg, #FFF 30%, var(--primary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #FF885B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Leaflet Map custom styles */
+.leaflet-container {
+  width: 100%;
+  height: 450px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leaflet-popup-content-wrapper {
+  background: #1B1E28 !important;
+  color: #FFF !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.leaflet-popup-tip {
+  background: #1B1E28 !important;
+}
+
+/* Micro-animations */
+@keyframes pulseSOS {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 25px rgba(255, 23, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 23, 68, 0);
+  }
+}
+
+.animate-pulse-sos {
+  animation: pulseSOS 2s infinite;
+}
+
+/* Custom Badges */
+.status-badge-custom {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge-custom.pending { background-color: rgba(220, 53, 69, 0.15); color: #DC3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+.status-badge-custom.accepted { background-color: rgba(255, 193, 7, 0.15); color: #FFC107; border: 1px solid rgba(255, 193, 7, 0.3); }
+.status-badge-custom.en_route { background-color: rgba(255, 193, 7, 0.15); color: #FFC107; border: 1px solid rgba(255, 193, 7, 0.3); }
+.status-badge-custom.arrived { background-color: rgba(13, 110, 253, 0.15); color: #0D6EFD; border: 1px solid rgba(13, 110, 253, 0.3); }
+.status-badge-custom.in_progress { background-color: rgba(13, 110, 253, 0.15); color: #0D6EFD; border: 1px solid rgba(13, 110, 253, 0.3); }
+.status-badge-custom.completed { background-color: rgba(40, 167, 69, 0.15); color: #28A745; border: 1px solid rgba(40, 167, 69, 0.3); }
+.status-badge-custom.cancelled { background-color: rgba(108, 117, 125, 0.15); color: #6C757D; border: 1px solid rgba(108, 117, 125, 0.3); }
+
+/* Dark Mode Form Control Styles */
+.form-control, .form-select {
+  color: #FFFFFF !important;
+  background-color: #11141D !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.form-control:focus, .form-select:focus {
+  color: #FFFFFF !important;
+  background-color: #151822 !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25) !important;
+}
+
+/* Fix autofill background and text color in Chrome/Safari */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #FFFFFF !important;
+  -webkit-box-shadow: 0 0 0 30px #11141D inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Legible Muted Text Contrast (FINAL ISSUE 1 FIXED!) */
+.text-muted {
+  color: #9CA3AF !important; /* Legible slate-gray for absolute contrast in dark themes */
+}
+
+/* Chat bubble styling for the Live Chat Engine (FINAL ISSUE 2 FIXED!) */
+.chat-messages-container {
+  height: 250px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.chat-bubble.self {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #FF885B 100%);
+  color: #FFFFFF;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+
+.chat-bubble.other {
+  background-color: rgba(255,255,255,0.08);
+  color: #F3F4F6;
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+
+/* Compulsory High-Contrast Readability Overrides (FINAL POLISH FIXED!) */
+.text-muted, 
+.text-white-50, 
+.text-secondary, 
+small, 
+.small,
+.text-muted-custom,
+.status-badge-custom.cancelled,
+p.text-muted,
+span.text-muted,
+small.text-muted,
+div.text-muted,
+strong.text-muted,
+.text-muted *,
+[class*="text-muted"],
+[class*="text-white-50"] {
+  color: #E5E7EB !important;
+  opacity: 1 !important;
+  --bs-text-opacity: 1 !important;
+  --bs-secondary-color: #E5E7EB !important;
+}
+
+/* Ensure estimates, price tags, and other critical highlights look incredibly premium and readable */
+.service-item-card small,
+.service-item-card .text-muted,
+.service-item-card .text-muted-custom {
+  color: #FFD700 !important; /* Gold for clear estimates */
+  opacity: 1 !important;
+}
+
+.form-label, 
+.form-control::placeholder,
+.form-select::placeholder {
+  color: #E5E7EB !important;
+  opacity: 0.95 !important;
+}
+
+.card, 
+.glass-card, 
+.alert {
+  color: #FFFFFF !important;
+}
+
+/* Headers global visibility color */
+h1, h2, h3, h4, h5, h6,
+.font-outfit {
+  color: #FFFFFF !important;
+}
+

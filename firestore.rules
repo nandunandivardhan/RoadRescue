@@ -1,0 +1,121 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============== UTILITY FUNCTIONS ==============
+    function isAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             (
+               (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAll(['roles']) &&
+                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.contains('admin'))
+               ||
+               (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAll(['role']) &&
+                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+             );
+    }
+
+    function isCustomer() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             (
+               (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAll(['roles']) &&
+                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.contains('customer'))
+               ||
+               (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAll(['role']) &&
+                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'customer')
+             );
+    }
+
+    function isMechanic() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/mechanics/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/mechanics/$(request.auth.uid))
+               .data.status == 'approved';
+    }
+
+    function isUser(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isAdminField(dataMap) {
+      return dataMap.keys().hasAny(['adminNotes', 'warnings', 'accountStatus', 'disabledAt',
+                                   'disabledBy', 'suspendedUntil', 'suspensionReason',
+                                   'suspendedBy', 'verified', 'verifiedAt', 'approvedAt',
+                                   'approvedBy', 'rejectionReason', 'activityLog']);
+    }
+
+    // ============== USERS COLLECTION ==============
+    match /users/{userId} {
+      allow read: if isUser(userId) || isAdmin();
+      allow update: if (isUser(userId) && !isAdminField(request.resource.data)) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      match /emergencyContacts/{contactId} {
+        allow read, write: if isUser(userId) || isAdmin();
+      }
+    }
+
+    // ============== MECHANICS COLLECTION ==============
+    match /mechanics/{mechanicId} {
+      allow read: if isUser(mechanicId) || isAdmin() || (isCustomer() && request.query.limit <= 100);
+      allow update: if (isUser(mechanicId) && !isAdminField(request.resource.data)) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == mechanicId;
+    }
+
+    // ============== REQUESTS COLLECTION ==============
+    match /requests/{requestId} {
+      allow read: if isAdmin() || 
+                     (isCustomer() && isUser(resource.data.customerId)) ||
+                     (isMechanic() && (isUser(resource.data.assignedMechanicId) || resource.data.status == 'open'));
+      
+      allow create: if isCustomer() &&
+                       isUser(request.resource.data.customerId) &&
+                       !isAdminField(request.resource.data);
+      
+      allow update: if isAdmin() ||
+                       (isCustomer() && isUser(resource.data.customerId) && !isAdminField(request.resource.data)) ||
+                       (isMechanic() && isUser(resource.data.assignedMechanicId) && !isAdminField(request.resource.data));
+    }
+
+    // ============== CHATS COLLECTION ==============
+    match /chats/{chatId} {
+      allow read: if isAdmin() || 
+                     (isCustomer() && isUser(resource.data.customerId)) ||
+                     (isMechanic() && isUser(resource.data.mechanicId));
+      allow create: if false;
+      
+      match /messages/{messageId} {
+        allow read: if isAdmin() ||
+                       (isCustomer() && isUser(get(/databases/$(database)/documents/chats/$(chatId)).data.customerId)) ||
+                       (isMechanic() && isUser(get(/databases/$(database)/documents/chats/$(chatId)).data.mechanicId));
+        
+        allow create: if (isCustomer() || isMechanic()) && request.auth != null;
+      }
+    }
+
+    // ============== ADMINS COLLECTION ==============
+    match /admins/{adminUserId} {
+      allow read: if isUser(adminUserId) || isAdmin();
+      allow write: if false;
+    }
+
+    // ============== EMERGENCY CONTACTS ==============
+    match /emergencyContacts/{contactId} {
+      allow read: if isAdmin() || (isCustomer() && isUser(resource.data.customerId));
+      allow create, update: if isCustomer() && isUser(request.resource.data.customerId);
+      allow delete: if isCustomer() && isUser(resource.data.customerId);
+    }
+
+    // ============== APP VERSIONS ==============
+    match /appVersions/{versionId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // ============== DENY ALL OTHER PATHS ==============
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadRescue | Admin Control Center</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #1B2CC1;
+            --dark-bg: #0F1117;
+            --sidebar-width: 260px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        #wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+        #sidebar {
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--dark-bg);
+            color: #fff;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+        #sidebar ul li a {
+            padding: 15px 25px;
+            font-size: 1.1em;
+            display: block;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        #sidebar ul li a:hover, #sidebar ul li.active a {
+            color: #fff;
+            background: var(--primary-color);
+        }
+        #sidebar ul li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+        #content {
+            width: 100%;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            padding: 25px;
+            color: #fff;
+        }
+        .stat-card.primary { background: linear-gradient(45deg, #FF6B35, #FF8F66); }
+        .stat-card.secondary { background: linear-gradient(45deg, #1B2CC1, #4A58D4); }
+        .stat-card.success { background: linear-gradient(45deg, #00C853, #00E676); }
+        .stat-card.danger { background: linear-gradient(45deg, #FF1744, #FF5252); }
+        
+        .stat-card h3 { font-size: 2.2rem; font-weight: 700; margin-bottom: 5px; }
+        .stat-card p { opacity: 0.8; margin-bottom: 0; }
+        
+        .table-container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .navbar {
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>RoadRescue</h3>
+                <small class="text-muted">ADMIN PANEL</small>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#"><i class="fas fa-th-large"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="#" onclick="alert('Mechanics module: Connects to /api/mechanics details')"><i class="fas fa-tools"></i> Mechanics</a>
+                </li>
+                <li>
+                    <a href="#" onclick="alert('Customers module: List of users with CUSTOMER role')"><i class="fas fa-users"></i> Customers</a>
+                </li>
+                <li>
+                    <a href="#" onclick="alert('Service Requests: Live tracking lists')"><i class="fas fa-clipboard-list"></i> Requests</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-link text-dark">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=FF6B35&color=fff" class="rounded-circle me-2" width="35" alt="Admin">
+                                <span>System Admin</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <!-- Stats Row -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card stat-card primary">
+                            <h3 id="stat-requests">0</h3>
+                            <p>Total Requests</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card secondary">
+                            <h3 id="stat-mechanics">0</h3>
+                            <p>Total Mechanics</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card success">
+                            <h3 id="stat-revenue">₹0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card danger">
+                            <h3 id="stat-sos">0</h3>
+                            <p>Pending SOS Requests</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Row -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="table-container shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">Recent Service Requests</h5>
+                                <button class="btn btn-sm btn-outline-primary" id="btn-refresh"><i class="fas fa-sync me-1"></i> Refresh</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Mechanic</th>
+                                            <th>Service</th>
+                                            <th>Status</th>
+                                            <th>Estimated Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="requests-table-body">
+                                        <!-- Dynamic entries will be inserted here -->
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                                Loading real-time requests...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card p-4">
+                            <h5 class="mb-4">System Monitor</h5>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Spring Boot REST API</span>
+                                    <span class="text-success" id="server-status">Connecting...</span>
+                                </div>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-success" id="server-progress" role="progressbar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Database Connection (MySQL)</span>
+                                    <span class="text-success">Active</span>
+                                </div>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Active Mechanics Load</span>
+                                    <span id="mech-load-pct">0%</span>
+                                </div>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" id="mech-load-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Admin Live Binding Script -->
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+
+        async function fetchDashboardData() {
+            try {
+                // Check Server Status
+                document.getElementById('server-status').textContent = 'Online';
+                document.getElementById('server-status').className = 'text-success';
+                document.getElementById('server-progress').className = 'progress-bar bg-success';
+
+                // 1. Fetch Requests
+                const requestsResponse = await fetch(`${API_BASE_URL}/requests`);
+                if (!requestsResponse.ok) throw new Error('Requests API error');
+                const requests = await requestsResponse.json();
+
+                // 2. Fetch Mechanics
+                const mechanicsResponse = await fetch(`${API_BASE_URL}/mechanics`);
+                if (!mechanicsResponse.ok) throw new Error('Mechanics API error');
+                const mechanics = await mechanicsResponse.json();
+
+                updateStats(requests, mechanics);
+                renderRequestsTable(requests);
+            } catch (error) {
+                console.error('Error fetching admin data:', error);
+                document.getElementById('server-status').textContent = 'Offline';
+                document.getElementById('server-status').className = 'text-danger';
+                document.getElementById('server-progress').className = 'progress-bar bg-danger';
+            }
+        }
+
+        function updateStats(requests, mechanics) {
+            // Total requests
+            document.getElementById('stat-requests').textContent = requests.length;
+
+            // Total mechanics
+            document.getElementById('stat-mechanics').textContent = mechanics.length;
+
+            // Pending requests (SOS)
+            const pendingSOS = requests.filter(r => r.status.toUpperCase() === 'PENDING').length;
+            document.getElementById('stat-sos').textContent = pendingSOS;
+
+            // Revenue calculation (Completed requests cost sum)
+            const totalRevenue = requests
+                .filter(r => r.status.toUpperCase() === 'COMPLETED')
+                .reduce((sum, r) => sum + (r.actualCost || r.estimatedCost || 0), 0);
+            
+            document.getElementById('stat-revenue').textContent = '₹' + Math.round(totalRevenue).toLocaleString('en-IN');
+
+            // Active mechanics load (percentage of mechanics currently assigned to active requests)
+            const busyMechanics = mechanics.filter(m => !m.isAvailable).length;
+            const loadPct = mechanics.length > 0 ? Math.round((busyMechanics / mechanics.length) * 100) : 0;
+            document.getElementById('mech-load-pct').textContent = `${loadPct}%`;
+            document.getElementById('mech-load-bar').style.width = `${loadPct}%`;
+        }
+
+        function renderRequestsTable(requests) {
+            const tbody = document.getElementById('requests-table-body');
+            tbody.innerHTML = '';
+
+            if (requests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No service requests found in the database.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Show latest 10 requests
+            const recentRequests = requests.slice(0, 10);
+
+            recentRequests.forEach(req => {
+                let badgeClass = 'bg-secondary text-white';
+                const status = req.status.toUpperCase();
+                
+                if (status === 'PENDING') badgeClass = 'bg-danger text-white';
+                else if (status === 'ACCEPTED' || status === 'EN_ROUTE') badgeClass = 'bg-warning text-dark';
+                else if (status === 'ARRIVED' || status === 'IN_PROGRESS') badgeClass = 'bg-primary text-white';
+                else if (status === 'COMPLETED') badgeClass = 'bg-success text-white';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#RR-${req.id}</strong></td>
+                        <td>${req.customerName || 'Driver'}</td>
+                        <td>${req.mechanicName || '<span class="text-muted">Unassigned</span>'}</td>
+                        <td>${req.issueType.replace('_', ' ').toUpperCase()}</td>
+                        <td><span class="status-badge ${badgeClass}">${req.status.replace('_', ' ')}</span></td>
+                        <td>₹${req.estimatedCost}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Initialize and setup polling
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDashboardData();
+            // Poll every 5 seconds for live dashboard updates
+            setInterval(fetchDashboardData, 5000);
+
+            document.getElementById('btn-refresh').addEventListener('click', () => {
+                fetchDashboardData();
+            });
+        });
+    </script>
+</body>
+</html>
