@@ -16,7 +16,7 @@ export const options = {
 };
 
 export default function () {
-  const url = __ENV.TARGET_URL || 'http://localhost:5173';
+  const url = __ENV.TARGET_URL || 'http://localhost:4173';
   const res = http.get(url);
   
   check(res, {

@@ -32,21 +32,21 @@ jobs:
         cd roadrescue-web
         npm run build
 
-    - name: Start Vite Development Server
+    - name: Start Vite Preview Server
       run: |
         cd roadrescue-web
-        npm run dev &
+        npm run preview &
       env:
         CI: true
 
-    - name: Wait for Vite Server
-      run: npx wait-on http://localhost:5173 --timeout 60000
+    - name: Wait for Vite Preview Server
+      run: npx wait-on http://localhost:4173 --timeout 60000
 
     - name: Run k6 Load Test
       uses: grafana/k6-action@v0.3.1
       with:
         filename: tests/load/k6Test.js
-        flags: --env TARGET_URL=http://localhost:5173
+        flags: --env TARGET_URL=http://localhost:4173
 
     - name: Upload Load Test HTML Report
       if: always()
