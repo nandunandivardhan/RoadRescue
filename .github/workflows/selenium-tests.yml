@@ -18,7 +18,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 22
         cache: 'npm'
         cache-dependency-path: roadrescue-web/package-lock.json
 
@@ -38,6 +38,9 @@ jobs:
         npm run dev &
       env:
         CI: true
+
+    - name: Wait for Vite Server
+      run: npx wait-on http://localhost:5173 --timeout 60000
 
     - name: Install Selenium test dependencies
       run: |
