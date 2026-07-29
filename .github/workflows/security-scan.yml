@@ -23,10 +23,12 @@ jobs:
         node-version: 22
 
     - name: Run Secret Scan (TruffleHog)
-      uses: trufflesecurity/trufflehog-oss-action@main
+      uses: trufflesecurity/trufflehog@main
       continue-on-error: true # Allow reporting without hard blocker if older history contains tokens
       with:
-        args: "--fail --yes ."
+        base: ""
+        head: "${{ github.head_ref || github.ref_name }}"
+        extra_args: "--fail"
 
     - name: Run Root Dependency Audit
       run: |
