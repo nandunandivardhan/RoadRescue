@@ -1,0 +1,8 @@
+{
+  "name": "roadrescue-appium-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "webdriverio": "^8.30.0"
+  }
+}

@@ -1,0 +1,53 @@
+name: Performance & Load Testing (k6)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  k6_load_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: roadrescue-web/package-lock.json
+
+    - name: Install Web App dependencies
+      run: |
+        cd roadrescue-web
+        npm ci
+
+    - name: Build Web App
+      run: |
+        cd roadrescue-web
+        npm run build
+
+    - name: Start Vite Development Server
+      run: |
+        cd roadrescue-web
+        npm run dev &
+      env:
+        CI: true
+
+    - name: Run k6 Load Test
+      uses: grafana/k6-action@v0.3.1
+      with:
+        filename: tests/load/k6Test.js
+        flags: --env TARGET_URL=http://localhost:5173
+
+    - name: Upload Load Test HTML Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: k6-load-test-report
+        path: k6-report.html

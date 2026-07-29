@@ -1,0 +1,59 @@
+name: Selenium Web E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  selenium:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: roadrescue-web/package-lock.json
+
+    - name: Install Web App dependencies
+      run: |
+        cd roadrescue-web
+        npm ci
+
+    - name: Build Web App
+      run: |
+        cd roadrescue-web
+        npm run build
+
+    - name: Start Vite Development Server
+      run: |
+        cd roadrescue-web
+        npm run dev &
+      env:
+        CI: true
+
+    - name: Install Selenium test dependencies
+      run: |
+        cd tests/selenium
+        npm install
+
+    - name: Run Selenium Tests
+      run: |
+        cd tests/selenium
+        node webTest.js
+
+    - name: Upload Test Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: selenium-test-reports
+        path: |
+          tests/selenium/selenium-report.html
+          tests/selenium/selenium-report.md

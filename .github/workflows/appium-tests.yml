@@ -1,0 +1,60 @@
+name: Appium Mobile E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  appium:
+    runs-on: macos-13 # macOS 13 is standard for nested Android hardware virtualization on GitHub Actions
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java (Android SDK dependency)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install Appium and Driver
+      run: |
+        npm install -g appium
+        appium driver install uiautomator2
+
+    - name: Start Appium Server
+      run: |
+        appium --log appium.log &
+      env:
+        CI: true
+
+    - name: Install Appium test dependencies
+      run: |
+        cd tests/appium
+        npm install
+
+    - name: Run Appium Tests
+      run: |
+        cd tests/appium
+        node appTest.js
+
+    - name: Upload Test Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: appium-test-reports
+        path: |
+          tests/appium/appium-report.html
+          tests/appium/appium-report.md
