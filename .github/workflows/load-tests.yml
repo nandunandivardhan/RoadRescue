@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js 22 LTS
       uses: actions/setup-node@v4
       with:
         node-version: 22
@@ -32,21 +32,52 @@ jobs:
         cd roadrescue-web
         npm run build
 
-    - name: Start Vite Preview Server
+    - name: Start Production Vite Preview Server
       run: |
         cd roadrescue-web
-        npm run preview &
-      env:
-        CI: true
+        nohup npm run preview -- --host 0.0.0.0 --port 4173 > vite.log 2>&1 &
+        echo $! > vite.pid
+        echo "Started Vite Preview server process PID: $(cat vite.pid)"
 
-    - name: Wait for Vite Preview Server
-      run: npx wait-on http://localhost:4173 --timeout 60000
+    - name: Health Check & Server Diagnostics
+      run: |
+        echo "Waiting for Vite Preview server on http://127.0.0.1:4173..."
+        npx wait-on http://127.0.0.1:4173 --timeout 60000
+
+        echo "=== Verifying Server Response Code ==="
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 || true)
+        echo "HTTP Response Status Code: $HTTP_STATUS"
+
+        if [ "$HTTP_STATUS" -ne 200 ]; then
+          echo "ERROR: Server health check failed! Expected HTTP 200, got $HTTP_STATUS"
+          echo "=== Vite Server Logs ==="
+          cat roadrescue-web/vite.log || true
+          exit 1
+        fi
+
+        echo "=== Active Processes & Port Listening Diagnostics ==="
+        ps aux | grep vite || true
+        ss -tuln | grep 4173 || netstat -tuln | grep 4173 || true
+        echo "Vite Preview server is HEALTHY, responding with HTTP 200 on http://127.0.0.1:4173"
+
+    - name: Setup k6 Native Runner
+      uses: grafana/setup-k6-action@v1
+      with:
+        k6-version: 'latest'
 
     - name: Run k6 Load Test
-      uses: grafana/k6-action@v0.3.1
+      uses: grafana/run-k6-action@v1
       with:
-        filename: tests/load/k6Test.js
-        flags: --env TARGET_URL=http://localhost:4173
+        path: tests/load/k6Test.js
+        flags: --env TARGET_URL=http://127.0.0.1:4173
+
+    - name: Post-Test Server Diagnostics
+      if: always()
+      run: |
+        echo "=== Post-Test Health Status ==="
+        echo "HTTP Response Status Code: $(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 || true)"
+        echo "=== Vite Preview Logs ==="
+        cat roadrescue-web/vite.log || true
 
     - name: Upload Load Test HTML Report
       if: always()
