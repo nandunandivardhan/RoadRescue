@@ -15,24 +15,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # Fetch all history for secret scanning
+        fetch-depth: 0
 
-    - name: Setup Node.js
+    - name: Setup Node.js 22 LTS
       uses: actions/setup-node@v4
       with:
         node-version: 22
 
     - name: Run Secret Scan (TruffleHog)
       uses: trufflesecurity/trufflehog@main
-      continue-on-error: true # Allow reporting without hard blocker if older history contains tokens
+      continue-on-error: true
       with:
         base: ""
         head: "${{ github.head_ref || github.ref_name }}"
         extra_args: "--fail"
 
     - name: Run Root Dependency Audit
-      run: |
-        npm audit --audit-level=high || true
+      run: npm audit --audit-level=high || true
 
     - name: Run Web App Dependency Audit
       run: |

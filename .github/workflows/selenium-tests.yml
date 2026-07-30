@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js 22 LTS
       uses: actions/setup-node@v4
       with:
         node-version: 22
@@ -32,15 +32,31 @@ jobs:
         cd roadrescue-web
         npm run build
 
-    - name: Start Vite Development Server
+    - name: Start Vite Dev Server
       run: |
         cd roadrescue-web
-        npm run dev &
-      env:
-        CI: true
+        nohup npm run dev > vite-dev.log 2>&1 &
+        echo $! > vite-dev.pid
+        echo "Started Vite Dev server PID: $(cat vite-dev.pid)"
 
-    - name: Wait for Vite Server
-      run: npx wait-on http://localhost:5173 --timeout 60000
+    - name: Wait for Vite Dev Server
+      run: |
+        for i in $(seq 1 30); do
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null || echo "000")
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "Vite Dev server is ready (HTTP 200)"
+            break
+          fi
+          echo "Attempt $i: HTTP $HTTP_STATUS - waiting..."
+          sleep 2
+        done
+
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null || echo "000")
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "ERROR: Vite Dev server failed to start"
+          cat roadrescue-web/vite-dev.log || true
+          exit 1
+        fi
 
     - name: Install Selenium test dependencies
       run: |
@@ -60,3 +76,4 @@ jobs:
         path: |
           tests/selenium/selenium-report.html
           tests/selenium/selenium-report.md
+        if-no-files-found: warn

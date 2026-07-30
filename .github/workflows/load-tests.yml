@@ -35,53 +35,67 @@ jobs:
     - name: Start Production Vite Preview Server
       run: |
         cd roadrescue-web
-        nohup npm run preview -- --host 0.0.0.0 --port 4173 > vite.log 2>&1 &
+        nohup npx vite preview --host 0.0.0.0 --port 4173 > vite.log 2>&1 &
         echo $! > vite.pid
-        echo "Started Vite Preview server process PID: $(cat vite.pid)"
+        echo "Started Vite Preview server PID: $(cat vite.pid)"
 
-    - name: Health Check & Server Diagnostics
+    - name: Health Check - Wait for Server
       run: |
         echo "Waiting for Vite Preview server on http://127.0.0.1:4173..."
-        npx wait-on http://127.0.0.1:4173 --timeout 60000
+        for i in $(seq 1 30); do
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 2>/dev/null || echo "000")
+          echo "Attempt $i: HTTP $HTTP_STATUS"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "Server is HEALTHY and responding with HTTP 200"
+            break
+          fi
+          sleep 2
+        done
 
-        echo "=== Verifying Server Response Code ==="
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 || true)
-        echo "HTTP Response Status Code: $HTTP_STATUS"
-
-        if [ "$HTTP_STATUS" -ne 200 ]; then
-          echo "ERROR: Server health check failed! Expected HTTP 200, got $HTTP_STATUS"
+        # Final verification
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 2>/dev/null || echo "000")
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "ERROR: Server failed to start. HTTP status: $HTTP_STATUS"
           echo "=== Vite Server Logs ==="
           cat roadrescue-web/vite.log || true
+          echo "=== Process List ==="
+          ps aux | grep -i vite || true
+          echo "=== Listening Ports ==="
+          ss -tuln | grep 4173 || true
           exit 1
         fi
 
-        echo "=== Active Processes & Port Listening Diagnostics ==="
-        ps aux | grep vite || true
-        ss -tuln | grep 4173 || netstat -tuln | grep 4173 || true
-        echo "Vite Preview server is HEALTHY, responding with HTTP 200 on http://127.0.0.1:4173"
+        echo "=== Server Diagnostics ==="
+        ps aux | grep -i vite || true
+        ss -tuln | grep 4173 || true
 
-    - name: Install k6 (Official Grafana Repository)
+    - name: Install k6
       run: |
-        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD194E22C704358A1382227D680576A01E42F9
-        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+          --keyserver hkp://keyserver.ubuntu.com:80 \
+          --recv-keys C5AD194E22C704358A1382227D680576A01E42F9
+        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+          | sudo tee /etc/apt/sources.list.d/k6.list
         sudo apt-get update
         sudo apt-get install -y k6
+        k6 version
 
     - name: Run k6 Load Test
-      run: |
-        k6 run tests/load/k6Test.js --env TARGET_URL=http://127.0.0.1:4173
+      run: k6 run tests/load/k6Test.js --env TARGET_URL=http://127.0.0.1:4173
 
-    - name: Post-Test Server Diagnostics
+    - name: Post-Test Diagnostics
       if: always()
       run: |
-        echo "=== Post-Test Health Status ==="
-        echo "HTTP Response Status Code: $(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 || true)"
+        echo "=== Post-Test Server Health ==="
+        curl -s -o /dev/null -w "HTTP %{http_code}" http://127.0.0.1:4173 || echo "Server unreachable"
+        echo ""
         echo "=== Vite Preview Logs ==="
-        cat roadrescue-web/vite.log || true
+        cat roadrescue-web/vite.log 2>/dev/null || echo "No logs found"
 
-    - name: Upload Load Test HTML Report
+    - name: Upload Load Test Report
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: k6-load-test-report
         path: k6-report.html
+        if-no-files-found: warn
