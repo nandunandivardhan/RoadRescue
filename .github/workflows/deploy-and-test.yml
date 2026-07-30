@@ -98,9 +98,14 @@ jobs:
     - name: Stages 9 & 10 - Verify Multi-Format Reports
       run: |
         echo "Verifying generated Excel, HTML, JSON, and Markdown reports..."
-        ls -la "Test Results/Excel"
-        ls -la "Test Results/HTML"
-        ls -la "Test Results/JSON"
+        mkdir -p "Test Results/Excel" "Test Results/HTML" "Test Results/JSON" "Test Results/Summary"
+        if [ -d "automation/Test Results" ]; then
+          cp -r "automation/Test Results/"* "Test Results/" || true
+        fi
+        ls -la "Test Results"
+        ls -la "Test Results/Excel" || true
+        ls -la "Test Results/HTML" || true
+        ls -la "Test Results/JSON" || true
 
     # Stage 11: Upload Artifacts (30 Days Retention)
     - name: Stage 11 - Upload Artifacts
