@@ -18,7 +18,7 @@ jobs:
     - name: Setup Node.js 22 LTS
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: 22.12.0
         cache: 'npm'
         cache-dependency-path: roadrescue-web/package-lock.json
 
