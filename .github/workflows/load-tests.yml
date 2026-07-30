@@ -63,16 +63,15 @@ jobs:
           exit 1
         fi
 
-    - name: Install k6 from official Grafana APT repository
+    - name: Install k6 (Direct Release Download)
       run: |
-        sudo gpg --no-default-keyring \
-          --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-          --keyserver hkp://keyserver.ubuntu.com:80 \
-          --recv-keys C5AD194E22C704358A1382227D680576A01E42F9
-        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
-          | sudo tee /etc/apt/sources.list.d/k6.list
-        sudo apt-get update
-        sudo apt-get install -y k6
+        K6_TAG=$(curl -s https://api.github.com/repos/grafana/k6/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "")
+        if [ -z "$K6_TAG" ]; then
+          K6_TAG="v0.56.0"
+        fi
+        echo "Downloading official k6 release ${K6_TAG}..."
+        curl -sL "https://github.com/grafana/k6/releases/download/${K6_TAG}/k6-${K6_TAG}-linux-amd64.tar.gz" | tar -xz
+        sudo mv "k6-${K6_TAG}-linux-amd64/k6" /usr/local/bin/k6
         echo "Installed k6 version: $(k6 version)"
 
     - name: Run k6 Load Test
