@@ -15,33 +15,37 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Java 17
+    - name: Setup Java 17 (Android SDK dependency)
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Node.js 22 LTS
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: '22.12'
 
     - name: Install Appium and UiAutomator2 Driver
       run: |
         npm install -g appium
         appium driver install uiautomator2
-        appium --version
+        echo "Appium version: $(appium --version)"
 
     - name: Start Appium Server
       run: |
-        nohup appium --log appium-server.log > /dev/null 2>&1 &
+        nohup appium --address 127.0.0.1 --port 4723 \
+          --log-level info --log appium-server.log > /dev/null 2>&1 &
         echo $! > appium.pid
-        echo "Started Appium server PID: $(cat appium.pid)"
-        sleep 5
+        echo "Appium server started (PID: $(cat appium.pid))"
 
     - name: Verify Appium Server
       run: |
-        for i in $(seq 1 10); do
+        echo "Waiting for Appium on http://127.0.0.1:4723/status ..."
+        for i in $(seq 1 15); do
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4723/status 2>/dev/null || echo "000")
           if [ "$STATUS" = "200" ]; then
             echo "Appium server is ready (HTTP 200)"
@@ -49,9 +53,15 @@ jobs:
             echo ""
             break
           fi
-          echo "Attempt $i: HTTP $STATUS - waiting..."
+          echo "Attempt $i/15: HTTP $STATUS"
           sleep 2
         done
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4723/status 2>/dev/null || echo "000")
+        if [ "$STATUS" != "200" ]; then
+          echo "WARNING: Appium server may not be fully ready (HTTP $STATUS)"
+          echo "--- appium-server.log ---"
+          cat appium-server.log 2>/dev/null | tail -50 || true
+        fi
 
     - name: Install Appium test dependencies
       run: |

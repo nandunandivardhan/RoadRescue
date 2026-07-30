@@ -15,10 +15,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js 22 LTS
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: '22.12'
         cache: 'npm'
         cache-dependency-path: roadrescue-web/package-lock.json
 
@@ -37,7 +37,7 @@ jobs:
         cd roadrescue-web
         nohup npm run dev > vite-dev.log 2>&1 &
         echo $! > vite-dev.pid
-        echo "Started Vite Dev server PID: $(cat vite-dev.pid)"
+        echo "Vite Dev server started (PID: $(cat vite-dev.pid))"
 
     - name: Wait for Vite Dev Server
       run: |
@@ -47,13 +47,12 @@ jobs:
             echo "Vite Dev server is ready (HTTP 200)"
             break
           fi
-          echo "Attempt $i: HTTP $HTTP_STATUS - waiting..."
+          echo "Attempt $i/30: HTTP $HTTP_STATUS - waiting..."
           sleep 2
         done
-
         HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null || echo "000")
         if [ "$HTTP_STATUS" != "200" ]; then
-          echo "ERROR: Vite Dev server failed to start"
+          echo "ERROR: Vite Dev server did not start"
           cat roadrescue-web/vite-dev.log || true
           exit 1
         fi
