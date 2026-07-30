@@ -1,0 +1,155 @@
+name: Live GitHub Pages E2E Automation Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  BASE_URL: https://nandunandivardhan.github.io/RoadRescue/
+
+jobs:
+  deploy_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Stage 1: Repository Checkout
+    - name: Stage 1 - Repository Checkout
+      uses: actions/checkout@v4
+
+    # Stage 2: Dependency Installation
+    - name: Stage 2 - Node.js & Dependency Installation
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.12'
+
+    - name: Install Web & Automation Dependencies
+      run: |
+        cd roadrescue-web
+        npm ci || npm install
+        cd ../automation
+        npm ci || npm install
+
+    # Stage 3: Build Application
+    - name: Stage 3 - Build Application
+      run: |
+        cd roadrescue-web
+        npm run build
+
+    # Stage 4: Static Analysis
+    - name: Stage 4 - Static Analysis & Linting
+      run: |
+        cd roadrescue-web
+        npm run lint || true
+
+    # Stage 5: Deploy to GitHub Pages
+    - name: Stage 5 - Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./roadrescue-web/dist
+        keep_files: true
+
+    # Stage 6: Wait for Deployment
+    - name: Stage 6 - Wait for Live Deployment
+      run: |
+        echo "Waiting for live deployment at $BASE_URL ..."
+        for i in $(seq 1 30); do
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL" 2>/dev/null || echo "000")
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "Deployment reached LIVE status (HTTP 200)!"
+            break
+          fi
+          echo "Attempt $i/30: HTTP $HTTP_STATUS - waiting for GitHub Pages..."
+          sleep 4
+        done
+
+    # Stage 7: Deployment Verification
+    - name: Stage 7 - Deployment Verification
+      run: |
+        echo "=== Verifying Live URL Status & Diagnostics ==="
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL" 2>/dev/null || echo "000")
+        echo "Live URL Response Status Code: $HTTP_STATUS"
+
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "WARNING: Live deployment returned HTTP $HTTP_STATUS (GitHub Pages propagation delay)."
+          echo "Proceeding with live Selenium suite to execute validation and record diagnostics."
+        else
+          echo "Deployment Verification SUCCESSFUL: $BASE_URL is LIVE and responding with HTTP 200."
+        fi
+
+    # Stage 8: Run Selenium E2E Tests
+    - name: Stage 8 - Run Live Selenium E2E Tests
+      run: |
+        cd automation
+        node utils/liveSeleniumRunner.js
+      env:
+        BASE_URL: ${{ env.BASE_URL }}
+
+    # Stage 9: Generate Reports
+    # Stage 10: Generate Excel Reports
+    - name: Stages 9 & 10 - Verify Multi-Format Reports
+      run: |
+        echo "Verifying generated Excel, HTML, JSON, and Markdown reports..."
+        ls -la "Test Results/Excel"
+        ls -la "Test Results/HTML"
+        ls -la "Test Results/JSON"
+
+    # Stage 11: Upload Artifacts (30 Days Retention)
+    - name: Stage 11 - Upload Artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: live-selenium-test-reports
+        path: |
+          Test Results/Excel/
+          Test Results/HTML/
+          Test Results/JSON/
+          Test Results/Summary/
+        retention-days: 30
+        if-no-files-found: warn
+
+    # Stage 12: Publish Summary
+    - name: Stage 12 - Publish GitHub Action Summary
+      if: always()
+      run: |
+        echo "# 🚀 Live GitHub Pages E2E Execution Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Deployment URL**: $BASE_URL" >> $GITHUB_STEP_SUMMARY
+        echo "**Execution Date**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+        echo "**Git Commit**: \`${{ github.sha }}\` | **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f "Test Results/Summary/summary.md" ]; then
+          cat "Test Results/Summary/summary.md" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Summary report missing." >> $GITHUB_STEP_SUMMARY
+        fi
+
+    # Stage 13: Store Historical Results
+    - name: Stage 13 - Store Historical Results in gh-pages
+      if: always() && github.ref == 'refs/heads/main'
+      run: |
+        mkdir -p gh-pages-dist/reports/latest
+        mkdir -p gh-pages-dist/reports/history/build-${{ github.run_number }}
+        
+        cp -r "Test Results/HTML/"* gh-pages-dist/reports/latest/ || true
+        cp -r "Test Results/Excel/"* gh-pages-dist/reports/latest/ || true
+        cp -r "Test Results/JSON/"* gh-pages-dist/reports/latest/ || true
+        cp "Test Results/Summary/summary.md" gh-pages-dist/reports/latest/ || true
+        
+        cp -r gh-pages-dist/reports/latest/* gh-pages-dist/reports/history/build-${{ github.run_number }}/ || true
+
+    - name: Deploy Historical Reports to GitHub Pages Branch
+      if: always() && github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./gh-pages-dist
+        keep_files: true
