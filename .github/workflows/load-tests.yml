@@ -15,10 +15,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js 22 LTS
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: '22.12'
         cache: 'npm'
         cache-dependency-path: roadrescue-web/package-lock.json
 
@@ -32,67 +32,61 @@ jobs:
         cd roadrescue-web
         npm run build
 
-    - name: Start Production Vite Preview Server
+    - name: Start Vite Preview Server
       run: |
         cd roadrescue-web
-        nohup npx vite preview --host 0.0.0.0 --port 4173 > vite.log 2>&1 &
-        echo $! > vite.pid
-        echo "Started Vite Preview server PID: $(cat vite.pid)"
+        nohup npx vite preview --host 0.0.0.0 --port 4173 > vite-preview.log 2>&1 &
+        echo $! > vite-preview.pid
+        echo "Vite Preview server started (PID: $(cat vite-preview.pid))"
 
-    - name: Health Check - Wait for Server
+    - name: Wait for Vite Preview Server
       run: |
-        echo "Waiting for Vite Preview server on http://127.0.0.1:4173..."
+        echo "Waiting for http://127.0.0.1:4173 ..."
         for i in $(seq 1 30); do
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 2>/dev/null || echo "000")
-          echo "Attempt $i: HTTP $HTTP_STATUS"
           if [ "$HTTP_STATUS" = "200" ]; then
-            echo "Server is HEALTHY and responding with HTTP 200"
+            echo "Server healthy (HTTP 200)"
             break
           fi
+          echo "Attempt $i/30: HTTP $HTTP_STATUS"
           sleep 2
         done
-
-        # Final verification
         HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4173 2>/dev/null || echo "000")
         if [ "$HTTP_STATUS" != "200" ]; then
-          echo "ERROR: Server failed to start. HTTP status: $HTTP_STATUS"
-          echo "=== Vite Server Logs ==="
-          cat roadrescue-web/vite.log || true
-          echo "=== Process List ==="
+          echo "ERROR: Preview server failed to start (HTTP $HTTP_STATUS)"
+          echo "--- vite-preview.log ---"
+          cat roadrescue-web/vite-preview.log || true
+          echo "--- processes ---"
           ps aux | grep -i vite || true
-          echo "=== Listening Ports ==="
+          echo "--- ports ---"
           ss -tuln | grep 4173 || true
           exit 1
         fi
 
-        echo "=== Server Diagnostics ==="
-        ps aux | grep -i vite || true
-        ss -tuln | grep 4173 || true
-
-    - name: Install k6
+    - name: Install k6 (Direct Release Download)
       run: |
-        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-          --keyserver hkp://keyserver.ubuntu.com:80 \
-          --recv-keys C5AD194E22C704358A1382227D680576A01E42F9
-        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
-          | sudo tee /etc/apt/sources.list.d/k6.list
-        sudo apt-get update
-        sudo apt-get install -y k6
-        k6 version
+        K6_TAG=$(curl -s https://api.github.com/repos/grafana/k6/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "")
+        if [ -z "$K6_TAG" ]; then
+          K6_TAG="v0.56.0"
+        fi
+        echo "Downloading official k6 release ${K6_TAG}..."
+        curl -sL "https://github.com/grafana/k6/releases/download/${K6_TAG}/k6-${K6_TAG}-linux-amd64.tar.gz" | tar -xz
+        sudo mv "k6-${K6_TAG}-linux-amd64/k6" /usr/local/bin/k6
+        echo "Installed k6 version: $(k6 version)"
 
     - name: Run k6 Load Test
       run: k6 run tests/load/k6Test.js --env TARGET_URL=http://127.0.0.1:4173
 
-    - name: Post-Test Diagnostics
+    - name: Post-test diagnostics
       if: always()
       run: |
-        echo "=== Post-Test Server Health ==="
+        echo "--- Post-test server health ---"
         curl -s -o /dev/null -w "HTTP %{http_code}" http://127.0.0.1:4173 || echo "Server unreachable"
         echo ""
-        echo "=== Vite Preview Logs ==="
-        cat roadrescue-web/vite.log 2>/dev/null || echo "No logs found"
+        echo "--- Vite Preview Logs ---"
+        cat roadrescue-web/vite-preview.log 2>/dev/null || echo "(no logs)"
 
-    - name: Upload Load Test Report
+    - name: Upload k6 HTML Report
       if: always()
       uses: actions/upload-artifact@v4
       with:

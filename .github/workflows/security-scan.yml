@@ -17,12 +17,12 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup Node.js 22 LTS
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: '22.12'
 
-    - name: Run Secret Scan (TruffleHog)
+    - name: Secret Scan (TruffleHog)
       uses: trufflesecurity/trufflehog@main
       continue-on-error: true
       with:
@@ -30,16 +30,29 @@ jobs:
         head: "${{ github.head_ref || github.ref_name }}"
         extra_args: "--fail"
 
-    - name: Run Root Dependency Audit
+    - name: Root Dependency Audit
       run: npm audit --audit-level=high || true
 
-    - name: Run Web App Dependency Audit
+    - name: Web App Dependency Audit
       run: |
         cd roadrescue-web
         npm audit --audit-level=high || true
 
-    - name: ESLint Security and Code Quality Check
+    - name: Install Web App dependencies
       run: |
         cd roadrescue-web
         npm ci
+
+    - name: ESLint Code Quality Check
+      run: |
+        cd roadrescue-web
         npm run lint || true
+
+    - name: Filesystem Security Scan (Trivy)
+      uses: aquasecurity/trivy-action@master
+      continue-on-error: true
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        severity: 'HIGH,CRITICAL'
+        format: 'table'
