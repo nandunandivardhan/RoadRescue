@@ -1,0 +1,57 @@
+name: Deploy Automation Reports to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: ["Android Appium E2E Automation Pipeline"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy_pages:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download Test Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: roadrescue-android-test-reports
+        path: ./downloaded-artifacts
+      continue-on-error: true
+
+    - name: Prepare GitHub Pages Payload
+      run: |
+        mkdir -p site/reports/latest
+        if [ -d "downloaded-artifacts/HTML" ]; then
+          cp -r downloaded-artifacts/HTML/* site/reports/latest/
+        elif [ -d "Test Results/HTML" ]; then
+          cp -r "Test Results/HTML/"* site/reports/latest/
+        fi
+        
+        cat << 'EOF' > site/index.html
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta http-equiv="refresh" content="0; url=reports/latest/execution-report.html">
+        </head>
+        <body>
+          <p>Redirecting to <a href="reports/latest/execution-report.html">RoadRescue E2E Test Report</a>...</p>
+        </body>
+        </html>
+        EOF
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
+        keep_files: true

@@ -1,0 +1,15 @@
+{
+  "name": "roadrescue-appium-automation",
+  "version": "1.0.0",
+  "description": "Enterprise Appium Mobile Automation & Reporting Framework for RoadRescue",
+  "main": "runners/run-e2e.js",
+  "type": "module",
+  "scripts": {
+    "test": "node runners/run-e2e.js",
+    "report": "node utils/htmlReporter.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "webdriverio": "^8.30.0"
+  }
+}
