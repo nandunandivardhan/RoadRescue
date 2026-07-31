@@ -27,9 +27,9 @@ export default function () {
 }
 
 export function handleSummary(data) {
-  // Generate HTML report and Markdown summaries
   return {
     'k6-report.html': htmlReport(data),
+    'k6-summary.json': JSON.stringify(data, null, 2),
     'stdout': textSummary(data, { indent: ' ', enableColors: true }),
   };
 }

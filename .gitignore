@@ -50,3 +50,5 @@ yarn-error.log*
 Test Results/
 tools/
 k6-report.html
+k6-summary.md
+k6-summary.json

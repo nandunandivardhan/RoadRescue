@@ -86,19 +86,13 @@ jobs:
         echo "--- Vite Preview Logs ---"
         cat roadrescue-web/vite-preview.log 2>/dev/null || echo "(no logs)"
 
-    - name: Publish Performance Step Summary
+    - name: Parse & Format Performance Step Summary
       if: always()
       run: |
-        echo "# ⚡ API Load & Performance Execution Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| Metric | Value | Threshold SLA | Status |" >> $GITHUB_STEP_SUMMARY
-        echo "| --- | --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
-        echo "| **Concurrent Virtual Users** | **100 VUs** | 100 VUs continuous | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-        echo "| **Throughput (RPS)** | **93.7 req/sec** | >50 req/sec | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-        echo "| **Average Latency** | **24.8 ms** | <250 ms | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-        echo "| **P95 Response Time** | **102.74 ms** | <800 ms | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-        echo "| **P99 Response Time** | **356.08 ms** | <1500 ms | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
-        echo "| **HTTP Error Rate** | **0.00%** | <1.00% | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+        node automation/utils/parseK6Summary.js
+        if [ -f "k6-summary.md" ]; then
+          cat k6-summary.md >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Upload k6 HTML Report
       if: always()
