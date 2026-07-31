@@ -35,7 +35,7 @@ import APKManagement from './pages/admin/APKManagement';
 
 function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL || '/RoadRescue/'}>
       <AuthProvider>
         <div className="d-flex flex-column min-vh-100 bg-dark text-white">
           <Navbar />

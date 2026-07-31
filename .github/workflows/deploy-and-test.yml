@@ -137,23 +137,33 @@ jobs:
           cat "Test Results/Summary/summary.md" >> $GITHUB_STEP_SUMMARY
         fi
 
-    # Stage 13: Store Historical Results & Portal Index
-    - name: Stage 13 - Store Historical Results & Portal Index in gh-pages
+    # Stage 13: Store Live Web App, Android APK & Reports Payload in gh-pages
+    - name: Stage 13 - Assemble Live Web App & QA Reports Payload
       if: always() && github.ref == 'refs/heads/main'
       run: |
         mkdir -p gh-pages-dist/reports/latest
         mkdir -p gh-pages-dist/reports/history/build-${{ github.run_number }}
         
+        # 1. Copy Web Application dist to root
+        if [ -d "roadrescue-web/dist" ]; then
+          cp -r roadrescue-web/dist/* gh-pages-dist/
+        fi
+        
+        # 2. Copy Android APK for direct browser download
+        if [ -f "RoadRescue.apk" ]; then
+          cp RoadRescue.apk gh-pages-dist/
+        fi
+        
+        # 3. Copy QA Reports into /reports/ and /reports/latest/
         cp -r "Test Results/HTML/"* gh-pages-dist/reports/latest/ || true
         cp -r "Test Results/Excel/"* gh-pages-dist/reports/latest/ || true
         cp -r "Test Results/JSON/"* gh-pages-dist/reports/latest/ || true
         cp "Test Results/Summary/consolidated-summary.md" gh-pages-dist/reports/latest/ || true
         
-        # Copy HTML files to gh-pages-dist root so they are directly accessible
-        cp -r gh-pages-dist/reports/latest/* gh-pages-dist/ || true
+        cp -r gh-pages-dist/reports/latest/* gh-pages-dist/reports/ || true
 
-        # Generate Portal index.html with links to all 4 reports
-        cat << 'EOF' > gh-pages-dist/index.html
+        # Generate Reports Portal index.html at /reports/index.html
+        cat << 'EOF' > gh-pages-dist/reports/index.html
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -171,10 +181,12 @@ jobs:
             .report-card h3 { color: var(--accent); margin: 0 0 8px 0; }
             .report-card p { color: #8b949e; font-size: 0.95rem; margin: 0; }
             .tag { display: inline-block; background: rgba(88, 166, 255, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-top: 12px; }
+            .back-link { display: inline-block; margin-bottom: 20px; color: var(--accent); text-decoration: none; font-weight: 600; }
           </style>
         </head>
         <body>
           <div class="container">
+            <a href="../" class="back-link">← Launch RoadRescue Web App</a>
             <h1>🚀 RoadRescue Quality & Automation Portal</h1>
             <p class="subtitle">Official Test Execution Evidence & Executive Dashboard</p>
             <div class="card-grid">
@@ -206,10 +218,10 @@ jobs:
         
         cp -r gh-pages-dist/reports/latest/* gh-pages-dist/reports/history/build-${{ github.run_number }}/ || true
 
-    - name: Deploy Historical Reports to GitHub Pages Branch
+    - name: Deploy Payload to GitHub Pages Branch
       if: always() && github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./gh-pages-dist
-        keep_files: true
+        keep_files: false
