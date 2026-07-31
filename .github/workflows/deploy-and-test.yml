@@ -63,8 +63,8 @@ jobs:
         echo "Waiting for live deployment at $BASE_URL ..."
         for i in $(seq 1 30); do
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL" 2>/dev/null || echo "000")
-          if [ "$HTTP_STATUS" = "200" ]; then
-            echo "Deployment reached LIVE status (HTTP 200)!"
+          if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "301" ] || [ "$HTTP_STATUS" = "302" ] || [ "$HTTP_STATUS" = "307" ] || [ "$HTTP_STATUS" = "308" ]; then
+            echo "Deployment reached LIVE status (HTTP $HTTP_STATUS)!"
             break
           fi
           echo "Attempt $i/30: HTTP $HTTP_STATUS - waiting for GitHub Pages..."
@@ -78,11 +78,11 @@ jobs:
         HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL" 2>/dev/null || echo "000")
         echo "Live URL Response Status Code: $HTTP_STATUS"
 
-        if [ "$HTTP_STATUS" != "200" ]; then
+        if [ "$HTTP_STATUS" != "200" ] && [ "$HTTP_STATUS" != "301" ] && [ "$HTTP_STATUS" != "302" ] && [ "$HTTP_STATUS" != "307" ] && [ "$HTTP_STATUS" != "308" ]; then
           echo "WARNING: Live deployment returned HTTP $HTTP_STATUS (GitHub Pages propagation delay)."
           echo "Proceeding with live Selenium suite to execute validation and record diagnostics."
         else
-          echo "Deployment Verification SUCCESSFUL: $BASE_URL is LIVE and responding with HTTP 200."
+          echo "Deployment Verification SUCCESSFUL: $BASE_URL is LIVE and responding with HTTP $HTTP_STATUS."
         fi
 
     # Stage 8: Run Selenium E2E Tests

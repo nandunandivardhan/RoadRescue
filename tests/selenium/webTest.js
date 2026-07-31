@@ -14,12 +14,14 @@ async function runTest() {
     .build();
 
   const results = [];
+  const targetUrl = process.env.TARGET_URL || process.env.BASE_URL || 'http://localhost:5173/RoadRescue/';
+
   try {
-    console.log('Starting Selenium tests...');
+    console.log(`Starting Selenium tests targeting: ${targetUrl} ...`);
     
     // Test 1: Load Landing Page
     results.push({ name: 'Load Landing Page', status: 'RUNNING' });
-    await driver.get('http://localhost:5173');
+    await driver.get(targetUrl);
     
     // Allow server a brief moment to respond
     await driver.sleep(1000);
