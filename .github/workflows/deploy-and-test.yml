@@ -93,19 +93,19 @@ jobs:
       env:
         BASE_URL: ${{ env.BASE_URL }}
 
-    # Stage 9: Generate Reports
-    # Stage 10: Generate Excel Reports
-    - name: Stages 9 & 10 - Verify Multi-Format Reports
+    # Stage 9 & 10: Generate Consolidated Multi-Format Reports
+    - name: Stages 9 & 10 - Verify Multi-Format & Consolidated Reports
       run: |
-        echo "Verifying generated Excel, HTML, JSON, and Markdown reports..."
+        echo "Generating Consolidated Excel, HTML, JSON, and Markdown reports..."
+        cd automation
+        node utils/consolidatedReporter.js
+        cd ..
         mkdir -p "Test Results/Excel" "Test Results/HTML" "Test Results/JSON" "Test Results/Summary"
         if [ -d "automation/Test Results" ]; then
           cp -r "automation/Test Results/"* "Test Results/" || true
         fi
-        ls -la "Test Results"
-        ls -la "Test Results/Excel" || true
-        ls -la "Test Results/HTML" || true
-        ls -la "Test Results/JSON" || true
+        ls -la "Test Results/Excel"
+        ls -la "Test Results/HTML"
 
     # Stage 11: Upload Artifacts (30 Days Retention)
     - name: Stage 11 - Upload Artifacts
@@ -125,16 +125,16 @@ jobs:
     - name: Stage 12 - Publish GitHub Action Summary
       if: always()
       run: |
-        echo "# 🚀 Live GitHub Pages E2E Execution Summary" >> $GITHUB_STEP_SUMMARY
+        echo "# 🚀 Live GitHub Pages E2E Execution & Quality Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Deployment URL**: $BASE_URL" >> $GITHUB_STEP_SUMMARY
         echo "**Execution Date**: $(date -u)" >> $GITHUB_STEP_SUMMARY
         echo "**Git Commit**: \`${{ github.sha }}\` | **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        if [ -f "Test Results/Summary/summary.md" ]; then
+        if [ -f "Test Results/Summary/consolidated-summary.md" ]; then
+          cat "Test Results/Summary/consolidated-summary.md" >> $GITHUB_STEP_SUMMARY
+        elif [ -f "Test Results/Summary/summary.md" ]; then
           cat "Test Results/Summary/summary.md" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "Summary report missing." >> $GITHUB_STEP_SUMMARY
         fi
 
     # Stage 13: Store Historical Results

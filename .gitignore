@@ -49,3 +49,4 @@ yarn-error.log*
 *.tsbuildinfo
 Test Results/
 tools/
+k6-report.html

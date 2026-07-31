@@ -57,12 +57,13 @@ jobs:
     - name: Run Spring Boot Backend Unit & Integration Tests
       run: |
         cd roadrescue-backend
-        mvn test -B || true
+        chmod +x mvnw || true
+        ./mvnw test -B || mvn test -B || true
 
     - name: Build Backend Package
       run: |
         cd roadrescue-backend
-        mvn package -DskipTests -B
+        ./mvnw package -DskipTests -B || mvn package -DskipTests -B
 
     - name: Install Load Test Utilities & Generate Reports
       run: |
