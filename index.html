@@ -1,48 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>RoadRescue Automation & Quality Reports Portal</title>
-  <style>
-    :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --text: #c9d1d9; --gold: #f2c94c; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 40px; margin: 0; display: flex; flex-direction: column; align-items: center; }
-    .container { max-width: 800px; width: 100%; }
-    h1 { color: #fff; margin-bottom: 8px; text-align: center; }
-    p.subtitle { color: #8b949e; text-align: center; margin-bottom: 32px; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .report-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; display: block; }
-    .report-card:hover { transform: translateY(-4px); border-color: var(--accent); }
-    .report-card h3 { color: var(--accent); margin: 0 0 8px 0; }
-    .report-card p { color: #8b949e; font-size: 0.95rem; margin: 0; }
-    .tag { display: inline-block; background: rgba(88, 166, 255, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-top: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🚀 RoadRescue Quality & Automation Portal</h1>
-    <p class="subtitle">Official Test Execution Evidence & Executive Dashboard</p>
-    <div class="card-grid">
-      <a href="consolidated-report.html" class="report-card">
-        <h3>📊 Consolidated Quality Report</h3>
-        <p>Executive quality dashboard, domain breakdowns (Selenium, Appium, Security, Load), and SLA indicators.</p>
-        <span class="tag">Executive Summary</span>
-      </a>
-      <a href="dashboard.html" class="report-card">
-        <h3>📈 Interactive Dashboard</h3>
-        <p>Real-time metric breakdown, status distribution, and execution analytics.</p>
-        <span class="tag">Metrics Dashboard</span>
-      </a>
-      <a href="execution-report.html" class="report-card">
-        <h3>📋 Detailed Execution Report</h3>
-        <p>Filterable test execution table detailing all test cases, status badges, and duration.</p>
-        <span class="tag">Detailed Results</span>
-      </a>
-      <a href="trends.html" class="report-card">
-        <h3>📉 Execution Trends</h3>
-        <p>Historical pass/fail trend analysis across automated build runs.</p>
-        <span class="tag">Trend Analysis</span>
-      </a>
-    </div>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/RoadRescue/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>RoadRescue | AI-Powered Real-Time Roadside Assistance</title>
+    <meta name="description" content="RoadRescue is an AI-powered real-time roadside assistance platform connecting stranded drivers with nearby mechanics instantly." />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Leaflet.js CSS for Map integration -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script type="module" crossorigin src="/RoadRescue/assets/index-_Kw5qVXT.js"></script>
+    <link rel="stylesheet" crossorigin href="/RoadRescue/assets/index-LGfqpkqk.css">
+  </head>
+  <body class="bg-dark text-white">
+    <div id="root"></div>
+  </body>
 </html>
