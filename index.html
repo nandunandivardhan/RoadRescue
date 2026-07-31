@@ -1,9 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=reports/latest/execution-report.html">
+  <meta charset="UTF-8">
+  <title>RoadRescue Automation & Quality Reports Portal</title>
+  <style>
+    :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --text: #c9d1d9; --gold: #f2c94c; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 40px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+    .container { max-width: 800px; width: 100%; }
+    h1 { color: #fff; margin-bottom: 8px; text-align: center; }
+    p.subtitle { color: #8b949e; text-align: center; margin-bottom: 32px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .report-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; display: block; }
+    .report-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .report-card h3 { color: var(--accent); margin: 0 0 8px 0; }
+    .report-card p { color: #8b949e; font-size: 0.95rem; margin: 0; }
+    .tag { display: inline-block; background: rgba(88, 166, 255, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-top: 12px; }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="reports/latest/execution-report.html">Latest Execution Report</a>...</p>
+  <div class="container">
+    <h1>🚀 RoadRescue Quality & Automation Portal</h1>
+    <p class="subtitle">Official Test Execution Evidence & Executive Dashboard</p>
+    <div class="card-grid">
+      <a href="consolidated-report.html" class="report-card">
+        <h3>📊 Consolidated Quality Report</h3>
+        <p>Executive quality dashboard, domain breakdowns (Selenium, Appium, Security, Load), and SLA indicators.</p>
+        <span class="tag">Executive Summary</span>
+      </a>
+      <a href="dashboard.html" class="report-card">
+        <h3>📈 Interactive Dashboard</h3>
+        <p>Real-time metric breakdown, status distribution, and execution analytics.</p>
+        <span class="tag">Metrics Dashboard</span>
+      </a>
+      <a href="execution-report.html" class="report-card">
+        <h3>📋 Detailed Execution Report</h3>
+        <p>Filterable test execution table detailing all test cases, status badges, and duration.</p>
+        <span class="tag">Detailed Results</span>
+      </a>
+      <a href="trends.html" class="report-card">
+        <h3>📉 Execution Trends</h3>
+        <p>Historical pass/fail trend analysis across automated build runs.</p>
+        <span class="tag">Trend Analysis</span>
+      </a>
+    </div>
+  </div>
 </body>
 </html>
