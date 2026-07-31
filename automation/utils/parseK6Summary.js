@@ -2,6 +2,15 @@ import fs from 'fs';
 import path from 'path';
 
 export function parseK6Summary(jsonFilePath = 'k6-summary.json', outputMdPath = 'k6-summary.md') {
+  const candidates = [
+    jsonFilePath,
+    'k6-summary.json',
+    'tests/load/k6-summary.json',
+    'Vulnerability Test Results/k6-summary.json'
+  ];
+
+  let targetJson = candidates.find(p => fs.existsSync(p));
+
   let metrics = {
     totalRequests: 5716,
     rps: '93.72 req/s',
@@ -18,9 +27,9 @@ export function parseK6Summary(jsonFilePath = 'k6-summary.json', outputMdPath = 
     slaStatus: '✅ PASSED',
   };
 
-  if (fs.existsSync(jsonFilePath)) {
+  if (targetJson) {
     try {
-      const raw = fs.readFileSync(jsonFilePath, 'utf8');
+      const raw = fs.readFileSync(targetJson, 'utf8');
       const data = JSON.parse(raw);
       const m = data.metrics || {};
       const state = data.state || {};
@@ -62,6 +71,7 @@ export function parseK6Summary(jsonFilePath = 'k6-summary.json', outputMdPath = 
         testDuration: durationSec,
         slaStatus: passSla ? '✅ PASSED' : '❌ FAILED',
       };
+      console.log(`Parsed k6 metrics from ${targetJson} successfully.`);
     } catch (e) {
       console.warn('Failed to parse k6-summary.json, using baseline metrics:', e.message);
     }
