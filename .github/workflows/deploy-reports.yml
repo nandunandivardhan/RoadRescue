@@ -38,9 +38,24 @@ jobs:
 
     - name: Prepare GitHub Pages Payload & Index
       run: |
+        cd roadrescue-web
+        npm ci || npm install
+        npm run build
+        cd ..
+
         mkdir -p site/reports/latest
         
-        # Copy HTML reports from downloaded artifacts or workspace
+        # 1. Copy Web Application dist to site root
+        if [ -d "roadrescue-web/dist" ]; then
+          cp -r roadrescue-web/dist/* site/
+        fi
+
+        # 2. Copy Android APK for direct browser download
+        if [ -f "RoadRescue.apk" ]; then
+          cp RoadRescue.apk site/
+        fi
+
+        # 3. Copy HTML reports from downloaded artifacts or workspace
         if [ -d "downloaded-artifacts/roadrescue-test-reports/HTML" ]; then
           cp -r downloaded-artifacts/roadrescue-test-reports/HTML/* site/reports/latest/
         elif [ -d "downloaded-artifacts/live-selenium-test-reports/HTML" ]; then
@@ -51,13 +66,10 @@ jobs:
           cp -r "Test Results/HTML/"* site/reports/latest/
         fi
 
-        # Make HTML reports available at root level
-        if [ -d "site/reports/latest" ]; then
-          cp -r site/reports/latest/* site/ || true
-        fi
-        
-        # Generate Portal index.html with links to all 4 reports
-        cat << 'EOF' > site/index.html
+        cp -r site/reports/latest/* site/reports/ || true
+
+        # Generate Reports Portal index.html at /reports/index.html
+        cat << 'EOF' > site/reports/index.html
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -75,10 +87,12 @@ jobs:
             .report-card h3 { color: var(--accent); margin: 0 0 8px 0; }
             .report-card p { color: #8b949e; font-size: 0.95rem; margin: 0; }
             .tag { display: inline-block; background: rgba(88, 166, 255, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-top: 12px; }
+            .back-link { display: inline-block; margin-bottom: 20px; color: var(--accent); text-decoration: none; font-weight: 600; }
           </style>
         </head>
         <body>
           <div class="container">
+            <a href="../" class="back-link">← Launch RoadRescue Web App</a>
             <h1>🚀 RoadRescue Quality & Automation Portal</h1>
             <p class="subtitle">Official Test Execution Evidence & Executive Dashboard</p>
             <div class="card-grid">
@@ -113,4 +127,4 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./site
-        keep_files: true
+        keep_files: false
